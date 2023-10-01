@@ -1,0 +1,4 @@
+package discordbot;
+
+class AppTest {
+}

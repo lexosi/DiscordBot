@@ -1,0 +1,33 @@
+# Carpeta de compilación de Java
+bin/
+
+# Carpeta de archivos generados por IDEs y editores
+.idea/
+.vscode/
+
+# Archivos de configuración de Eclipse
+.settings/
+
+# Carpetas y archivos específicos de NetBeans
+nbproject/
+nb-configuration.xml
+
+# Archivos de registro
+*.log
+
+# Carpetas y archivos generados por Maven
+target/
+mvnw
+mvnw.cmd
+
+# Carpetas y archivos generados por Gradle
+build/
+.gradle/
+
+# Carpeta y archivos de dependencias
+lib/
+
+# Carpeta y archivos de registros y respaldo
+log/
+backup/
+Constants.java
