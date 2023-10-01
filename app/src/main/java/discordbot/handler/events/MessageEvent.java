@@ -17,9 +17,5 @@ public class MessageEvent implements DiscordEvent<MessageCreateEvent> {
         if (MEMBER == null || MEMBER.isBot()) {
             return;
         }
-
-        if (event.getMessage().getContent().equalsIgnoreCase("!hello")) {
-            event.getMessage().getChannel().block().createMessage("Hello World!").block();
-        }
     }
 }

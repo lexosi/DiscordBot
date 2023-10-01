@@ -1,6 +1,7 @@
 package discordbot.manager;
 
 import discord4j.core.event.domain.Event;
+import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.rest.service.ApplicationService;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.DiscordClient;
@@ -8,6 +9,7 @@ import discordbot.Constants;
 
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -63,13 +65,16 @@ public abstract class DiscordManager {
 
     private void registerCommands(GatewayDiscordClient client) {
         final ApplicationService SERVICE = client.getRestClient().getApplicationService();
-        final Collection<DiscordCommand> COMMANDS = CommandManager.INSTANCE.getValues().values();
-
         final long CLIENT_ID = client.getRestClient().getApplicationId().block();
-        for (DiscordCommand command : COMMANDS) {
-            SERVICE.createGlobalApplicationCommand(CLIENT_ID, command.getCommandRequest()).subscribe();
-        }
 
+        final Collection<DiscordCommand> COMMANDS = CommandManager.INSTANCE.getValues().values();
+        final List<ApplicationCommandRequest> COMMAND_LIST = new ArrayList<>() {
+            {
+                COMMANDS.stream().map(DiscordCommand::getCommandRequest).forEach(this::add);
+            }
+        };
+
+        SERVICE.bulkOverwriteGlobalApplicationCommand(CLIENT_ID, COMMAND_LIST).subscribe();
         System.out.println("Registered " + COMMANDS.size() + " commands.");
     }
 }

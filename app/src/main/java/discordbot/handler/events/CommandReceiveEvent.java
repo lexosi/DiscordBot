@@ -1,6 +1,7 @@
 package discordbot.handler.events;
 
 import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent;
+import discord4j.core.object.command.ApplicationCommandInteraction;
 import discordbot.handler.DiscordCommand;
 import discordbot.handler.DiscordEvent;
 
@@ -20,6 +21,11 @@ public class CommandReceiveEvent implements DiscordEvent<ApplicationCommandInter
             event.reply("Command not found").subscribe();
             return;
         }
-        COMMAND.execute(event);
+
+        final ApplicationCommandInteraction INTERACTION = event.getInteraction().getCommandInteraction().orElse(null);
+        if (INTERACTION != null) {
+            COMMAND.execute(event, INTERACTION);
+            return;
+        }
     }
 }
