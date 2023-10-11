@@ -17,6 +17,8 @@ dependencies {
     implementation 'com.google.guava:guava:31.1-jre'
 
     implementation 'com.discord4j:discord4j-core:3.2.5'
+
+    implementation 'org.xerial:sqlite-jdbc:3.43.0.0'
 }
 
 application {
