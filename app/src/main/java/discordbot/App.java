@@ -27,4 +27,5 @@ public class App {
         CommandManager.INSTANCE.register(new DiceCommand());
         CommandManager.INSTANCE.register(new TrainingCommand());
     }
+
 }
