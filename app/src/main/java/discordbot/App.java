@@ -2,19 +2,21 @@ package discordbot;
 
 import discordbot.manager.CommandManager;
 import discordbot.manager.DiscordManager;
-import discordbot.handler.commands.DiceCommand;
-import discordbot.handler.commands.FormatCommand;
-import discordbot.handler.commands.HelloCommand;
-import discordbot.handler.commands.TrainingCommand;
+
+import java.lang.reflect.Constructor;
+import java.util.Collection;
+
+import discordbot.handler.DiscordCommand;
 import discordbot.handler.events.CommandReceiveEvent;
 import discordbot.handler.events.MessageEvent;
 import discordbot.manager.EventManager;
+import discordbot.utilities.ReflectionUtilities;
 
 public class App {
 
     public static void main(String[] args) {
         App.register();
-        
+
         DiscordManager.INSTANCE.login();
     }
 
@@ -22,10 +24,26 @@ public class App {
         EventManager.INSTANCE.register(new MessageEvent());
         EventManager.INSTANCE.register(new CommandReceiveEvent());
 
-        CommandManager.INSTANCE.register(new HelloCommand());
-        CommandManager.INSTANCE.register(new FormatCommand());
-        CommandManager.INSTANCE.register(new DiceCommand());
-        CommandManager.INSTANCE.register(new TrainingCommand());
+        final Collection<Class<?>> COMMAND_CLASSES = ReflectionUtilities
+                .readFilesFromFolder("discordbot.handler.commands");
+
+        for (Class<?> commandClass : COMMAND_CLASSES) {
+            try {
+                final Constructor<?> constructor = commandClass.getDeclaredConstructor();
+                if (constructor == null) {
+                    continue;
+                }
+                constructor.setAccessible(true);
+
+                final Object command = constructor.newInstance();
+                if (command instanceof DiscordCommand discordComand) {
+                    CommandManager.INSTANCE.register(discordComand);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
 }

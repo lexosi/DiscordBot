@@ -35,7 +35,9 @@ public class ReflectionUtilities {
             try {
                 /* Class.forName */
                 // Class.forName("es.nex.threads.App")
-
+                if (PACKAGE_NAME.contains("$")) {
+                    continue;
+                }
                 System.out.println("Reading class of: " + PACKAGE_NAME);
                 final Class<?> CLAZZ = Class.forName(PACKAGE_NAME);
                 CLASSES.add(CLAZZ);
