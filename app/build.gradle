@@ -3,10 +3,17 @@
  * For more details take a look at the 'Building Java & JVM projects' chapter in the Gradle
  * User Manual available at https://docs.gradle.org/8.0.2/userguide/building_java_projects.html
  */
-
-plugins {
-    id 'application'
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'com.github.johnrengelman:shadow:8.1.1'
+    }
 }
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
 
 repositories {
     mavenCentral()
@@ -16,15 +23,25 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
     implementation 'com.google.guava:guava:31.1-jre'
 
-    implementation 'com.discord4j:discord4j-core:3.2.5'
+    shadow(implementation('com.discord4j:discord4j-core:3.2.5'))
 
     implementation 'org.xerial:sqlite-jdbc:3.43.0.0'
 }
 
-application {
-    mainClass = 'discordbot.App'
-}
-
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'discordbot.App'
+        )
+    }
+}
+
+shadowJar {
+   archiveBaseName.set('shadow')
+   archiveClassifier.set('')
+   archiveVersion.set('')
 }
