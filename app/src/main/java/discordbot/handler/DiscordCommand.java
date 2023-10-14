@@ -17,6 +17,8 @@ public interface DiscordCommand {
         return new ArrayList<>();
     }
 
+    void execute(ApplicationCommandInteractionEvent event, ApplicationCommandInteraction interaction);
+
     String getCommandDescription();
 
     default ApplicationCommandRequest getCommandRequest() {
@@ -27,5 +29,4 @@ public interface DiscordCommand {
                 .build();
     }
 
-    void execute(ApplicationCommandInteractionEvent discord, ApplicationCommandInteraction interaction);
 }
