@@ -24,6 +24,7 @@ dependencies {
     implementation 'com.google.guava:guava:31.1-jre'
 
     shadow(implementation('com.discord4j:discord4j-core:3.2.6'))
+    implementation 'org.reflections:reflections:0.10.2'
     implementation(files("libraries/jdbc.jar"))
 }
 
