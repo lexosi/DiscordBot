@@ -22,7 +22,7 @@ public class MessageEvent implements DiscordEvent<MessageCreateEvent> {
         if (content.startsWith("!say ")) {
             final String result = content.substring(5);
             event.getMessage().getChannel().block().createMessage(result).block();
+            event.getMessage().delete().block();
         }
-        event.getMessage().delete().block();
     }
 }
