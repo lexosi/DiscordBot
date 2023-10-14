@@ -15,6 +15,12 @@ buildscript {
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 
+compileJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
 repositories {
     mavenCentral()
 }
@@ -45,3 +51,4 @@ shadowJar {
    archiveClassifier.set('')
    archiveVersion.set('')
 }
+
