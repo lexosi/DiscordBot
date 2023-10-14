@@ -1,21 +1,22 @@
 package discordbot;
 
-import discordbot.manager.CommandManager;
-import discordbot.manager.DiscordManager;
-
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 
-import discordbot.handler.DiscordCommand;
-import discordbot.handler.DiscordEvent;
-import discordbot.manager.EventManager;
 import discordbot.utilities.ReflectionUtilities;
+import discordbot.manager.DiscordManager;
+import discordbot.manager.database.MysqlConnection;
+import discordbot.handler.DiscordCommand;
+import discordbot.handler.DiscordComponent;
+import discordbot.handler.DiscordEvent;
+import discordbot.manager.discord.*;
 
 public class App {
 
     public static void main(String[] args) {
         App.register();
 
+        MysqlConnection.INSTANCE.connectMySQL();
         DiscordManager.INSTANCE.login();
     }
 
@@ -55,6 +56,26 @@ public class App {
                 final Object command = constructor.newInstance();
                 if (command instanceof DiscordCommand discordComand) {
                     CommandManager.INSTANCE.register(discordComand);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        final Collection<Class<?>> COMPONENT_CLASSES = ReflectionUtilities
+                .readFilesFromFolder("discordbot.handler.components");
+
+        for (Class<?> componentClass : COMPONENT_CLASSES) {
+            try {
+                final Constructor<?> constructor = componentClass.getDeclaredConstructor();
+                if (constructor == null) {
+                    continue;
+                }
+                constructor.setAccessible(true);
+
+                final Object component = constructor.newInstance();
+                if (component instanceof DiscordComponent discordComponent) {
+                    ComponentManager.INSTANCE.register(discordComponent);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

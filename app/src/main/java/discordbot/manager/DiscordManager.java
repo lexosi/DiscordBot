@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import discordbot.handler.DiscordCommand;
 import discordbot.handler.DiscordEvent;
+import discordbot.manager.discord.*;
 
 public abstract class DiscordManager {
     public static final DiscordManager INSTANCE = new DiscordManager() {
