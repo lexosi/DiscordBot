@@ -1,8 +1,7 @@
-package discordbot.handler.commands;
+package discordbot.handler.commands.management;
 
 import discordbot.manager.database.MysqlConnection;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,20 +17,11 @@ public class PerformDataCommand implements DiscordCommand {
     @Override
     public void execute(ApplicationCommandInteractionEvent event, ApplicationCommandInteraction interaction) {
         final String statement = interaction.getOption("data").get().getValue().get().asString();
-        final String execute = interaction.getOption("execute").get().getValue().get().asString();
 
         try {
 
-            String stringResult = "undefined";
-            if (execute.equalsIgnoreCase("query")) {
-                final ResultSet resultSet = MysqlConnection.INSTANCE.queryStatement(statement);
-                if (resultSet != null) {
-                    stringResult = resultSet.
-                }
-            } else {
-                final boolean result = MysqlConnection.INSTANCE.executeStatement(statement);
-                stringResult = result + "";
-            }
+            final boolean result = MysqlConnection.INSTANCE.executeStatement(statement);
+            String stringResult = result + "";
 
             event.reply(InteractionApplicationCommandCallbackSpec.builder()
                     .content("Ejecutado con el resultado: " + stringResult)
@@ -47,13 +37,6 @@ public class PerformDataCommand implements DiscordCommand {
     public List<ApplicationCommandOptionData> getCommandOptions() {
         return new ArrayList<>() {
             {
-                this.add(ApplicationCommandOptionData.builder()
-                        .name("execute")
-                        .description("'query' o 'execute'")
-                        .type(ApplicationCommandOption.Type.STRING.getValue())
-                        .required(true)
-                        .build());
-
                 this.add(ApplicationCommandOptionData.builder()
                         .name("data")
                         .description("Statement.")

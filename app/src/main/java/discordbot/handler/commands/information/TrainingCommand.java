@@ -1,4 +1,4 @@
-package discordbot.handler.commands;
+package discordbot.handler.commands.information;
 
 import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent;
 import discord4j.core.object.command.ApplicationCommandInteraction;

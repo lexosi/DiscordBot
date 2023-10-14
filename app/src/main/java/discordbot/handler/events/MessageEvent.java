@@ -13,9 +13,16 @@ public class MessageEvent implements DiscordEvent<MessageCreateEvent> {
 
     @Override
     public void execute(MessageCreateEvent event) {
-        final Member MEMBER = event.getMember().orElse(null);
-        if (MEMBER == null || MEMBER.isBot()) {
+        final Member member = event.getMember().orElse(null);
+        if (member == null || member.isBot()) {
             return;
         }
+
+        final String content = event.getMessage().getContent();
+        if (content.startsWith("!say ")) {
+            final String result = content.substring(5);
+            event.getMessage().getChannel().block().createMessage(result).block();
+        }
+        event.getMessage().delete().block();
     }
 }

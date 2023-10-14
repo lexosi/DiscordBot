@@ -5,10 +5,14 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import discordbot.Constants;
 
 public abstract class MysqlConnection {
+    public static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
+
     public static final MysqlConnection INSTANCE = new MysqlConnection(
             "com.mysql.cj.jdbc.Driver",
             Constants.MYSQL_DATABASE,

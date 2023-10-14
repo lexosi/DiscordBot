@@ -1,4 +1,4 @@
-package discordbot.handler.commands;
+package discordbot.handler.commands.data;
 
 import java.util.List;
 

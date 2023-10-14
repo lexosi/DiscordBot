@@ -3,8 +3,6 @@ package discordbot.handler.components;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.interaction.ComponentInteractionEvent;
@@ -18,12 +16,13 @@ import discordbot.handler.DiscordComponent;
 import discord4j.core.object.entity.Member;
 import java.util.concurrent.CompletableFuture;
 
+import discordbot.manager.database.MysqlConnection;
+
 public class AuthModal implements DiscordComponent<InteractionPresentModalSpec> {
 
     public static final String ID = "authModal";
 
     private static final String AUTH_TITLE = "Autentificación con Github";
-    private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
 
     @Override
     public void execute(ComponentInteractionEvent interactionEvent) {
@@ -84,8 +83,49 @@ public class AuthModal implements DiscordComponent<InteractionPresentModalSpec> 
                         .subscribe();
                 return false;
             }
-        }, AuthModal.EXECUTOR).thenAcceptAsync(connected -> {
+        }, MysqlConnection.EXECUTOR).thenAcceptAsync(connected -> {
             if (!connected) {
+                return;
+            }
+
+            /* Add member to the db */
+            try {
+                final long memberId = member.getId().asLong();
+
+                /* Ayudarte a que lo veas mas claro, eso es un placeholder */
+                // String.format("STATEMENT CON PLACEHOLDER %s", REEMPLAZOS);
+                // String.format("%s %s.", "Hola", "Mundo");
+                // String.format("Esto se reemplaza en orden: 1. %s 2. %s", "Hola", "Mundo")
+                /* La primera %s corresponde con el primer elemento q pones para reemplazar */
+
+                // Check if user exists
+                if (MysqlConnection.INSTANCE.queryStatement(String.format(
+                        "SELECT * FROM users WHERE id = %s", memberId)).next()) {
+                    interactionEvent.reply("Ya estás registrado en el sistema.")
+                            .withEphemeral(true)
+                            .subscribe();
+                    return;
+                }
+
+                // Check if the githubUser is duplicated
+                if (MysqlConnection.INSTANCE.queryStatement(String.format(
+                        "SELECT * FROM users WHERE github_user = '%s'", githubUser)).next()) {
+                    interactionEvent.reply("El usuario de github ya está registrado.")
+                            .withEphemeral(true)
+                            .subscribe();
+                    return;
+                }
+
+                // Add user to the db
+                MysqlConnection.INSTANCE.executeStatement(String.format(
+                        "INSERT INTO users(id, github_user) VALUES (%s, '%s')",
+                        memberId, githubUser));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                interactionEvent.reply("Error al autentificar con la base de datos.")
+                        .withEphemeral(true)
+                        .subscribe();
                 return;
             }
 
@@ -94,7 +134,7 @@ public class AuthModal implements DiscordComponent<InteractionPresentModalSpec> 
             interactionEvent.reply("Has sido logeado con éxito con el usuario de github: " + githubUser)
                     .withEphemeral(true)
                     .subscribe();
-        }, AuthModal.EXECUTOR);
+        }, MysqlConnection.EXECUTOR);
     }
 
     public InteractionPresentModalSpec provide(Member member) {
@@ -113,29 +153,4 @@ public class AuthModal implements DiscordComponent<InteractionPresentModalSpec> 
     public String getComponentId() {
         return AuthModal.ID;
     }
-
-    /*
-     * Java
-     * React
-     * Angular
-     * NodeJS
-     * Vue
-     * PHP
-     * Python
-     * Big Data
-     */
-    /*
-     * final SelectMenu SELECT_LANGUAGE = SelectMenu.of("language",
-     * Option.of("Java", "java"),
-     * Option.of("React", "react"),
-     * Option.of("Angular", "angular"),
-     * Option.of("NodeJS", "js"),
-     * Option.of("Vue", "vue"),
-     * Option.of("PHP", "php"),
-     * Option.of("Python", "py"),
-     * Option.of("BigData", "bigdata"))
-     * .withPlaceholder("Selecciona algún lenguaje.")
-     * .withMinValues(1);
-     * SELECT_LANGUAGE.withMaxValues(SELECT_LANGUAGE.getOptions().size())
-     */
 }
