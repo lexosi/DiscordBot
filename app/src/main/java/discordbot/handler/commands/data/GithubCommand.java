@@ -3,6 +3,7 @@ package discordbot.handler.commands.data;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.Connection;
 import java.util.concurrent.CompletableFuture;
 
 import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent;
@@ -25,12 +26,12 @@ public class GithubCommand implements DiscordCommand {
         CompletableFuture.supplyAsync(() -> {
             final long userId = USER.getId().asLong();
 
-            try {
+            try (Connection connection = MysqlConnection.INSTANCE.getConnection()) {
                 /* Check if exists */
 
                 // Obtenemos la query y el statement (Similar a un iterator)
-                final ResultSet SET = MysqlConnection.INSTANCE.queryStatement(String.format(
-                        "SELECT github_user FROM users WHERE id = %s", userId));
+                final ResultSet SET = MysqlConnection.INSTANCE.queryStatement(connection,
+                        String.format("SELECT github_user FROM users WHERE id = %s", userId));
 
                 // Obtenemos el siguiente elemento y vemos si existe, si no existe:
                 /*

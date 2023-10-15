@@ -19,17 +19,19 @@ public class PerformDataCommand implements DiscordCommand {
         final String statement = interaction.getOption("data").get().getValue().get().asString();
 
         try {
-
             final boolean result = MysqlConnection.INSTANCE.executeStatement(statement);
             String stringResult = result + "";
 
             event.reply(InteractionApplicationCommandCallbackSpec.builder()
                     .content("Ejecutado con el resultado: " + stringResult)
-                    .build()).block();
+                    .build()).subscribe();
+
         } catch (Exception e) {
+            e.printStackTrace();
             event.reply(InteractionApplicationCommandCallbackSpec.builder()
-                    .content("Error al ejecutar el comando: " + e.getMessage())
-                    .build()).block();
+                    .content("Error al ejecutar el comando.")
+                    .ephemeral(true)
+                    .build()).subscribe();
         }
     }
 

@@ -1,7 +1,6 @@
 package discordbot.manager.database;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
@@ -15,6 +14,7 @@ public abstract class MysqlConnection {
     public static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
 
     public static final MysqlConnection INSTANCE = new MysqlConnection(
+            "com.mysql.cj.jdbc.Driver",
             Constants.MYSQL_DATABASE,
             Constants.MYSQL_SERVER,
             Constants.MYSQL_PORT,
@@ -29,11 +29,14 @@ public abstract class MysqlConnection {
     private final String username;
     private final String password;
 
+    private final String driver;
     private HikariDataSource dataSource;
 
-    public MysqlConnection(String database, String hostname, int port,
+    public MysqlConnection(String driver, String database,
+            String hostname, int port,
             String username, String password) {
 
+        this.driver = driver;
         this.database = database;
         this.hostname = hostname;
         this.port = port;
@@ -48,6 +51,8 @@ public abstract class MysqlConnection {
 
     public void connectMySQL() {
         final HikariDataSource database = new HikariDataSource();
+        database.setDriverClassName(this.driver);
+
         database.setJdbcUrl(this.getURL());
         database.setUsername(this.username);
         database.setPassword(this.password);
@@ -72,9 +77,7 @@ public abstract class MysqlConnection {
 
     public boolean executeStatement(String statement) {
         try (Connection connection = MysqlConnection.INSTANCE.getConnection()) {
-            final boolean result = this.executeStatement(connection, statement);
-            this.disconnectMySQL(connection);
-            return result;
+            return this.executeStatement(connection, statement);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -83,9 +86,7 @@ public abstract class MysqlConnection {
 
     public ResultSet queryStatement(String statement) {
         try (Connection connection = MysqlConnection.INSTANCE.getConnection()) {
-            final ResultSet result = this.queryStatement(connection, statement);
-            this.disconnectMySQL(connection);
-            return result;
+            return this.queryStatement(connection, statement);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -97,9 +98,7 @@ public abstract class MysqlConnection {
         if (connection == null) {
             throw new Exception("MySQL Connection is null.");
         }
-
-        final PreparedStatement preparedStatement = connection.prepareStatement(statement);
-        return preparedStatement.execute();
+        return connection.createStatement().execute(statement);
     }
 
     /* Importante meter dentro de un try catch siempre */
@@ -107,8 +106,6 @@ public abstract class MysqlConnection {
         if (connection == null) {
             throw new Exception("MySQL Connection is null.");
         }
-
-        final PreparedStatement preparedStatement = connection.prepareStatement(statement);
-        return preparedStatement.executeQuery();
+        return connection.createStatement().executeQuery(statement);
     }
 }

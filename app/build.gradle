@@ -30,8 +30,10 @@ dependencies {
     implementation 'com.google.guava:guava:31.1-jre'
 
     shadow(implementation('com.discord4j:discord4j-core:3.2.6'))
+
+    implementation(files("libraries/jdbc.jar"))
     implementation 'org.reflections:reflections:0.10.2'
-    implementation 'com.zaxxer:HikariCP:2.3.2'
+    implementation 'com.zaxxer:HikariCP:5.0.1'
 }
 
 tasks.named('test') {
