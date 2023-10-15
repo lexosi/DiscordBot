@@ -10,6 +10,7 @@ import discord4j.core.object.command.ApplicationCommandInteraction;
 import discord4j.core.object.command.ApplicationCommandOption;
 import discord4j.core.object.entity.User;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
+
 import discordbot.manager.database.MysqlConnection;
 import discordbot.handler.DiscordCommand;
 
@@ -28,8 +29,8 @@ public class GithubCommand implements DiscordCommand {
                 /* Check if exists */
 
                 // Obtenemos la query y el statement (Similar a un iterator)
-                final ResultSet SET = MysqlConnection.INSTANCE.queryStatement(
-                        String.format("SELECT github_user FROM users WHERE id = %s", userId));
+                final ResultSet SET = MysqlConnection.INSTANCE.queryStatement(String.format(
+                        "SELECT github_user FROM users WHERE id = %s", userId));
 
                 // Obtenemos el siguiente elemento y vemos si existe, si no existe:
                 /*
