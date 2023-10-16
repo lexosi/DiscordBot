@@ -3,6 +3,7 @@ package discordbot.handler.components;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import java.sql.Connection;
 
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.interaction.ComponentInteractionEvent;
@@ -89,7 +90,7 @@ public class AuthModal implements DiscordComponent<InteractionPresentModalSpec> 
             }
 
             /* Add member to the db */
-            try {
+            try (Connection connection = MysqlConnection.INSTANCE.getConnection()) {
                 final long memberId = member.getId().asLong();
 
                 /* Ayudarte a que lo veas mas claro, eso es un placeholder */
@@ -99,7 +100,7 @@ public class AuthModal implements DiscordComponent<InteractionPresentModalSpec> 
                 /* La primera %s corresponde con el primer elemento q pones para reemplazar */
 
                 // Check if user exists
-                if (MysqlConnection.INSTANCE.queryStatement(String.format(
+                if (MysqlConnection.INSTANCE.queryStatement(connection, String.format(
                         "SELECT * FROM users WHERE id = %s", memberId)).next()) {
                     interactionEvent.reply("Ya estás registrado en el sistema.")
                             .withEphemeral(true)
@@ -108,7 +109,7 @@ public class AuthModal implements DiscordComponent<InteractionPresentModalSpec> 
                 }
 
                 // Check if the githubUser is duplicated
-                if (MysqlConnection.INSTANCE.queryStatement(String.format(
+                if (MysqlConnection.INSTANCE.queryStatement(connection, String.format(
                         "SELECT * FROM users WHERE github_user = '%s'", githubUser)).next()) {
                     interactionEvent.reply("El usuario de github ya está registrado.")
                             .withEphemeral(true)
@@ -117,7 +118,7 @@ public class AuthModal implements DiscordComponent<InteractionPresentModalSpec> 
                 }
 
                 // Add user to the db
-                MysqlConnection.INSTANCE.executeStatement(String.format(
+                MysqlConnection.INSTANCE.executeStatement(connection, String.format(
                         "INSERT INTO users(id, github_user) VALUES (%s, '%s')",
                         memberId, githubUser));
 
